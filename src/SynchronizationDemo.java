@@ -1,34 +1,55 @@
 class Table {
-    // TODO: synchronized method void printTable(int n)
-    // Loop from 1 to 5 (as per sample) or 10
-    // Print n * i + " "
-    // Handle InterruptedException (try-catch Thread.sleep(400))
+    // 1. Synchronized method ensures only one thread accesses this at a time
+    synchronized void printTable(int n) {
+        for (int i = 1; i <= 5; i++) {
+            System.out.println(n * i);
+            try {
+                // Sleep to simulate processing time and make concurrency obvious
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                System.out.println(e);
+            }
+        }
+    }
 }
 
 class MyThread1 extends Thread {
     Table t;
+
     MyThread1(Table t) {
         this.t = t;
     }
+
     public void run() {
-        // TODO: Call t.printTable(5)
+        // Calls printTable with 5
+        t.printTable(5);
     }
 }
 
 class MyThread2 extends Thread {
     Table t;
+
     MyThread2(Table t) {
         this.t = t;
     }
+
     public void run() {
-        // TODO: Call t.printTable(100)
+        // Calls printTable with 100
+        t.printTable(100);
     }
 }
 
 public class SynchronizationDemo {
     public static void main(String[] args) {
-        // TODO: Create Table object
-        // TODO: Create MyThread1 and MyThread2 objects passing the table object
-        // TODO: Start both threads
+        // 2. Create a single Table instance shared by both threads
+        Table obj = new Table();
+
+        MyThread1 t1 = new MyThread1(obj);
+        MyThread2 t2 = new MyThread2(obj);
+
+        // 3. Start the threads
+        // Because printTable is synchronized, t2 will wait until t1 finishes (or vice versa)
+        t1.start();
+        t2.start();
     }
 }
