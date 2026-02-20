@@ -1,55 +1,46 @@
 class Table {
-    // 1. Synchronized method ensures only one thread accesses this at a time
+    // 1. The synchronized keyword locks this object when the method is called.
+    // No other thread can enter this method on the same object until the lock is released.
     synchronized void printTable(int n) {
+        System.out.println("Printing table of " + n);
         for (int i = 1; i <= 5; i++) {
             System.out.println(n * i);
             try {
-                // Sleep to simulate processing time and make concurrency obvious
+                // Sleep allows context switching, but the lock prevents other threads from entering.
                 Thread.sleep(400);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 System.out.println(e);
             }
         }
     }
 }
 
-class MyThread1 extends Thread {
+class MyThread extends Thread {
     Table t;
+    int number;
 
-    MyThread1(Table t) {
+    MyThread(Table t, int number) {
         this.t = t;
+        this.number = number;
     }
 
     public void run() {
-        // Calls printTable with 5
-        t.printTable(5);
-    }
-}
-
-class MyThread2 extends Thread {
-    Table t;
-
-    MyThread2(Table t) {
-        this.t = t;
-    }
-
-    public void run() {
-        // Calls printTable with 100
-        t.printTable(100);
+        t.printTable(number);
     }
 }
 
 public class SynchronizationDemo {
     public static void main(String[] args) {
-        // 2. Create a single Table instance shared by both threads
+        // 2. Create a single shared resource (Table object)
         Table obj = new Table();
 
-        MyThread1 t1 = new MyThread1(obj);
-        MyThread2 t2 = new MyThread2(obj);
+        // 3. Create two threads sharing the same Table object
+        MyThread t1 = new MyThread(obj, 5);
+        MyThread t2 = new MyThread(obj, 100);
 
-        // 3. Start the threads
-        // Because printTable is synchronized, t2 will wait until t1 finishes (or vice versa)
+        // 4. Start the threads
         t1.start();
         t2.start();
     }
 }
+
