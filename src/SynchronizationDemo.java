@@ -1,34 +1,46 @@
 class Table {
-    // TODO: synchronized method void printTable(int n)
-    // Loop from 1 to 5 (as per sample) or 10
-    // Print n * i + " "
-    // Handle InterruptedException (try-catch Thread.sleep(400))
+    // 1. The synchronized keyword locks this object when the method is called.
+    // No other thread can enter this method on the same object until the lock is released.
+    synchronized void printTable(int n) {
+        System.out.println("Printing table of " + n);
+        for (int i = 1; i <= 5; i++) {
+            System.out.println(n * i);
+            try {
+                // Sleep allows context switching, but the lock prevents other threads from entering.
+                Thread.sleep(400);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
 }
 
-class MyThread1 extends Thread {
+class MyThread extends Thread {
     Table t;
-    MyThread1(Table t) {
-        this.t = t;
-    }
-    public void run() {
-        // TODO: Call t.printTable(5)
-    }
-}
+    int number;
 
-class MyThread2 extends Thread {
-    Table t;
-    MyThread2(Table t) {
+    MyThread(Table t, int number) {
         this.t = t;
+        this.number = number;
     }
+
     public void run() {
-        // TODO: Call t.printTable(100)
+        t.printTable(number);
     }
 }
 
 public class SynchronizationDemo {
     public static void main(String[] args) {
-        // TODO: Create Table object
-        // TODO: Create MyThread1 and MyThread2 objects passing the table object
-        // TODO: Start both threads
+        // 2. Create a single shared resource (Table object)
+        Table obj = new Table();
+
+        // 3. Create two threads sharing the same Table object
+        MyThread t1 = new MyThread(obj, 5);
+        MyThread t2 = new MyThread(obj, 100);
+
+        // 4. Start the threads
+        t1.start();
+        t2.start();
     }
 }
+
